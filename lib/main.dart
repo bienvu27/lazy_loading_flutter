@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lazy_loading_flutter/home_page.dart';
 
+import 'home_page_copy.dart';
+
 void main() {
   runApp(const MyApp());
 }
