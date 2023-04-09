@@ -1,10 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-
-import 'model/lists_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,19 +10,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static int page = 1;
+  static int page = 0;
   final ScrollController _sc = ScrollController();
   bool isLoading = false;
   List users = [];
-  final dio = Dio();
-  ListsModel? listsModel;
-
   @override
   void initState() {
     _getMoreData(page);
     super.initState();
     _sc.addListener(() {
-      if (_sc.position.pixels == _sc.position.maxScrollExtent) {
+      if (_sc.position.pixels ==
+          _sc.position.maxScrollExtent) {
         _getMoreData(page);
       }
     });
@@ -43,23 +37,13 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         isLoading = true;
       });
-      var url = "https://randomuser.me/api/?page=$index&results=20&seed=abc";
+      final url = "https://randomuser.me/api/?page=$index&results=20&seed=abc";
       final response = await http.get(Uri.parse(url));
-      print(url);
-      // final response = await dio.get(url);
-      final rawData = Map<String, dynamic>.from(Map<String, dynamic>.from(Map<String, dynamic>.from(
-        jsonDecode(response.body),
-      )));
-      listsModel = ListsModel.fromJson(jsonDecode(response.body));
-      print(rawData);
-
+      final data = jsonDecode(response.body);
       List tList = [];
-      for (int i = 0; i < listsModel!.results!.length; i++) {
-        tList.add(listsModel!.results![i]);
+      for (int i = 0; i < data['results'].length; i++) {
+        tList.add(data['results'][i]);
       }
-      // for (int i = 0; i < response.data['results'].length; i++) {
-      //   tList.add(response.data['results'][i]);
-      // }
 
       setState(() {
         isLoading = false;
@@ -72,12 +56,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
         title: const Text("Lazy Load Large List"),
       ),
       body: Container(
         child: _buildList(),
       ),
+
     );
   }
 
@@ -93,11 +79,11 @@ class _HomePageState extends State<HomePage> {
             leading: CircleAvatar(
               radius: 30.0,
               backgroundImage: NetworkImage(
-               '${listsModel?.results?[index].picture?.thumbnail}',
+                users[index]['picture']['large'],
               ),
             ),
-            title: Text('${listsModel?.results?[index].email}'),
-            subtitle: Text('${listsModel?.results?[index].location?.country}'),
+            title: Text((users[index]['name']['first'])),
+            subtitle: Text((users[index]['email'])),
           );
         }
       },
